@@ -3,12 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <title>todo 앱</title>
 </head>
 <body>
-    <h1>todo 앱</h1>
-    <p>{{todos}}</p>
-    <p>{{data2}}</p>
+    <!-- <img src="/static/images/todo_img.jpg" alt="todo 이미지"> -->
+    
+    <main>
+        <a href="/"><p class="head_img"></p></a>
+        <h4>나를 성장시키는 메모</h4>
+        <br>
+        <form action="/add" method="post">
+            <!-- <textarea name="task" rows="5" placeholder="Enter your task" id="task" required></textarea> -->
+            <textarea name="task" rows="5" placeholder="Enter your task" id="task"></textarea>
+            <button type="submit" id="add_task">
+            Add
+            </button>
+        </form>
+        <br>
+	    <h2>Tasks</h2>
+        <div>
+            <div class="task">
+                <strike></strike>
+                <small>
+                    <a href="">Edit</a>
+                    <a href="">Delete</a>
+                </small>
+            </div>
+        </div>
 
+    </main>
+     
 </body>
 </html>
