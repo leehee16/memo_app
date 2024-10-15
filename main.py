@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Form, Request, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
-from database import Base, SessionLocal
+from sqlalchemy.orm import Session
+from database import Base, SessionLocal, engine
 import models
-from database import Base, engine
+from datetime import datetime
 
 app = FastAPI()
 
@@ -18,23 +20,54 @@ templates = Jinja2Templates(directory="templates")
 ## 정적파일(static) 종류(image, css, js)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 데이터베이스 세션 의존성 함수
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 # localhost:8000/
 @app.get("/")
-async def home(request: Request):
-    # 비즈니스 로직 처리
-    data = 100
-    data2 = "fastapi 잘하고 싶다."
+async def home(request: Request, db: Session = Depends(get_db)):
+    todos = db.query(models.Todo).filter(models.Todo.completed == False).all()
+    logs = db.query(models.Log).order_by(models.Log.completed_date.desc()).all()
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "todos": data, "data2": data2}
-        )
+        {"request": request, "todos": todos, "logs": logs}
+    )
 
 @app.post("/add")
-async def add(request: Request, task: str = Form(...)):
-    # 클라이언트에서 textarea에서 입력 데이터 넘어오면
-    # db 테이블에 저장하고 결과를 html에 랜더링에서 리턴
-    print(task)
-    pass
+async def add(task: str = Form(...), db: Session = Depends(get_db)):
+    if task.strip() == "":
+        raise HTTPException(status_code=400, detail="Task cannot be empty")
+    try:
+        new_todo = models.Todo(task=task)
+        db.add(new_todo)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/delete/{todo_id}")
+async def delete(todo_id: int, db: Session = Depends(get_db)):
+    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    if todo:
+        db.delete(todo)
+        db.commit()
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/complete/{todo_id}")
+async def complete(todo_id: int, db: Session = Depends(get_db)):
+    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    if todo:
+        todo.completed = True
+        log = models.Log(todo_id=todo.id, task=todo.task)
+        db.add(log)
+        db.commit()
+    return RedirectResponse(url="/", status_code=303)
 
 # python main.py
 if __name__ == "__main__":
