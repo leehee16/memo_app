@@ -10,8 +10,8 @@ from datetime import datetime
 
 app = FastAPI()
 
-# DB 엔진 연결
-Base.metadata.create_all(bind=engine)
+# 데이터베이스 테이블 생성
+models.Base.metadata.create_all(bind=engine)
 
 # html 문서를 위한 객체
 templates = Jinja2Templates(directory="templates")
