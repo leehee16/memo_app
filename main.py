@@ -69,6 +69,22 @@ async def complete(todo_id: int, db: Session = Depends(get_db)):
         db.commit()
     return RedirectResponse(url="/", status_code=303)
 
+@app.get("/edit/{todo_id}")
+async def edit_form(request: Request, todo_id: int, db: Session = Depends(get_db)):
+    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    return templates.TemplateResponse("edit.html", {"request": request, "todo": todo})
+
+@app.post("/edit/{todo_id}")
+async def edit_todo(todo_id: int, task: str = Form(...), db: Session = Depends(get_db)):
+    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    todo.task = task
+    db.commit()
+    return RedirectResponse(url="/", status_code=303)
+
 # python main.py
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True)

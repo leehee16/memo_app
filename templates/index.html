@@ -53,21 +53,22 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <h2 class="h4 mb-3">할 일 목록</h2>
-                            <div class="list-group">
+                            <ul class="list-group">
                                 {% for todo in todos %}
-                                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <span>{{ todo.task }}</span>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ todo.task }}
                                     <div>
-                                        <form action="/complete/{{ todo.id }}" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-success btn-sm">완료</button>
+                                        <button onclick="openEditModal({{ todo.id }}, '{{ todo.task }}')" class="btn btn-sm btn-warning">수정</button>
+                                        <form action="/complete/{{ todo.id }}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-success">완료</button>
                                         </form>
-                                        <form action="/delete/{{ todo.id }}" method="post" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                                        <form action="/delete/{{ todo.id }}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger">삭제</button>
                                         </form>
                                     </div>
-                                </div>
+                                </li>
                                 {% endfor %}
-                            </div>
+                            </ul>
                         </div>
                     </div>
 
@@ -125,6 +126,16 @@
                 }
             });
         });
+
+        function openEditModal(id, task) {
+            document.getElementById('editForm').action = `/edit/${id}`;
+            document.getElementById('editTask').value = task;
+            $('#editModal').modal('show');
+        }
+
+        function submitEditForm() {
+            document.getElementById('editForm').submit();
+        }
     </script>
 </body>
 </html>
