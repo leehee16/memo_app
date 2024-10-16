@@ -1,46 +1,15 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>할 일 수정</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', path='/css/main.css') }}" rel="stylesheet">
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="content-wrapper mt-5">
-                    <h2>할 일 수정</h2>
-                    <form action="/edit/{{ todo.id }}" method="post">
-                        <div class="form-group">
-                            <label for="task">할 일:</label>
-                            <input type="text" class="form-control" id="task" name="task" value="{{ todo.task }}" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">수정</button>
-                        <a href="/" class="btn btn-secondary">취소</a>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        // 다크 모드 토글 함수
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-        }
+{% extends "base.html" %}
 
-        // 페이지 로드 시 다크 모드 상태 확인
-        document.addEventListener('DOMContentLoaded', (event) => {
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-            }
-        });
-    </script>
-</body>
-</html>
+{% block title %}할 일 수정{% endblock %}
+
+{% block content %}
+<h2>할 일 수정</h2>
+<form action="/edit/{{ todo.id }}" method="post">
+    <div class="form-group">
+        <label for="task">할 일:</label>
+        <input type="text" class="form-control" id="task" name="task" value="{{ todo.task }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">수정</button>
+    <a href="/" class="btn btn-secondary">취소</a>
+</form>
+{% endblock %}
